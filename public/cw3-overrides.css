@@ -1,0 +1,21 @@
+/* Typography specified for CW3; Webflow's original Gantari faces are in the captured CSS. */
+@font-face { font-family: Inter; src: url('/assets/inter-400.ttf') format('truetype'); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: Inter; src: url('/assets/inter-500.ttf') format('truetype'); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: Inter; src: url('/assets/inter-600.ttf') format('truetype'); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: Inter; src: url('/assets/inter-700.ttf') format('truetype'); font-style: normal; font-weight: 700; font-display: swap; }
+.w-webflow-badge { display: none !important; }
+h1, h2, h3, h4, h5, h6,
+.display-1, .display-2, .display-3,
+.navigation-item-text, .navigation-item-text-2 {
+  font-family: Gantari, sans-serif;
+}
+p, figcaption, .rich-text-block-2,
+.w-richtext, .text-field-form, .field-label {
+  font-family: Inter, Arial, sans-serif;
+}
+
+@media (max-width: 479px) {
+  .about-title.absolute { transform: none !important; }
+  .hero.inner > .container { width: 100%; }
+  .hero.inner .display-1._7 { width: 100%; overflow-wrap: anywhere; }
+}

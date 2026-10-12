@@ -1,0 +1,5 @@
+.vercel/
+.env*
+!sample.env
+capture.log
+__pycache__/

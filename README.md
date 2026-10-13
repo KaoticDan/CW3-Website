@@ -8,7 +8,7 @@ Run `node dev.mjs` from this folder, then open `http://127.0.0.1:3000`. The prev
 
 ## Rebuild the capture
 
-Run `python capture.py`, then `python prepare.py`. The first command reads public pages and assets from Webflow; the second produces the reviewable static site and applies the small local fixes.
+Run `python capture.py`, then `python prepare.py`, then `python optimize.py`. The first command reads public pages and assets from Webflow; the second produces the reviewable static site and applies the small local fixes. The last command uses Pillow to create smaller WebP images, add intrinsic image dimensions, and remove redundant font loading.
 
 ## Form storage after review
 

@@ -6,6 +6,8 @@
 - The Webflow branding badge, duplicate header hover logo, and footer Author placeholder link are removed from the local copy.
 - Local menu animation, navigation, Work form validation, and success/error display logic checked. Every captured route responds locally.
 - At a 390 px viewport, every captured route fits without horizontal overflow after two narrow-screen fixes.
+- The follow-up mobile review and fixes across 320–1024 px are documented in [MOBILE_AUDIT.md](MOBILE_AUDIT.md).
+- The local performance pass and its comparison with the supplied GTmetrix report are documented in [PERFORMANCE_AUDIT.md](PERFORMANCE_AUDIT.md).
 - The only source form is on `/work`; its label suggests resume upload, but no upload control exists in the source.
 - The source `/hire` Google appointment iframe displays “Appointment not found”.
 - Source template copy and placeholder links are retained where no finished content exists. The two obvious footer mislinks for Hire and About are corrected to their existing pages.

@@ -5,6 +5,37 @@ removeWebflowBadge();
 new MutationObserver(removeWebflowBadge).observe(document.body, { childList: true, subtree: true });
 
 document.addEventListener('DOMContentLoaded', () => {
+  const menuToggle = document.querySelector('.navbar .hamburger');
+  const menu = document.querySelector('.menu');
+  if (menuToggle && menu) {
+    menu.id = menu.id || 'site-menu';
+    menuToggle.setAttribute('role', 'button');
+    menuToggle.setAttribute('tabindex', '0');
+    menuToggle.setAttribute('aria-controls', menu.id);
+    const syncMenuState = () => {
+      const open = getComputedStyle(menu).display !== 'none';
+      menuToggle.setAttribute('aria-expanded', String(open));
+      menuToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    };
+    new MutationObserver(syncMenuState).observe(menu, { attributes: true, attributeFilter: ['style', 'class'] });
+    menuToggle.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        menuToggle.click();
+      }
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && menuToggle.getAttribute('aria-expanded') === 'true') {
+        menuToggle.click();
+        menuToggle.focus();
+      }
+    });
+    syncMenuState();
+  }
+  document.querySelectorAll('.navbar .brand-logo, .footer .brand-logo').forEach((link) => {
+    link.setAttribute('aria-label', 'Careers in Web3 home');
+  });
+
   const form = document.querySelector('form[data-name="Email Form"]');
   if (!form || location.pathname !== '/work') return;
 

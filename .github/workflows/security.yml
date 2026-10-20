@@ -1,0 +1,105 @@
+name: Website security baseline
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '21 8 * * 2'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: website-security-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+defaults:
+  run:
+    shell: bash
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+jobs:
+  secrets:
+    name: Website / secrets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      executed: ${{ steps.receipt.outputs.executed }}
+      source_sha: ${{ steps.receipt.outputs.source_sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - run: |
+          docker run --rm --network none --user "$(id -u):$(id -g)" -e HOME=/tmp --entrypoint gitleaks \
+            -v "$GITHUB_WORKSPACE:/repo:ro" \
+            ghcr.io/gitleaks/gitleaks@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f \
+            git /repo --log-opts=--all --redact=100
+      - id: receipt
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          printf 'executed=true\nsource_sha=%s\n' "$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+  sast:
+    name: Website / static security rules
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      executed: ${{ steps.receipt.outputs.executed }}
+      source_sha: ${{ steps.receipt.outputs.source_sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: |
+          docker run --rm --network none --user "$(id -u):$(id -g)" -e HOME=/tmp --entrypoint semgrep \
+            -v "$GITHUB_WORKSPACE:/src:ro" -w /src \
+            semgrep/semgrep@sha256:81474464c1f07483ba0682a44787fd93c91397419762a04abe2bafaae396304b \
+            scan --oss-only --metrics=off --disable-version-check --test \
+            --config .security/semgrep.yml .security/fixtures/semgrep.js
+          docker run --rm --network none --user "$(id -u):$(id -g)" -e HOME=/tmp --entrypoint semgrep \
+            -v "$GITHUB_WORKSPACE:/src:ro" -w /src \
+            semgrep/semgrep@sha256:81474464c1f07483ba0682a44787fd93c91397419762a04abe2bafaae396304b \
+            scan --oss-only --metrics=off --disable-version-check --strict --error \
+            --config .security/semgrep.yml --exclude .security/fixtures .
+      - id: receipt
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          printf 'executed=true\nsource_sha=%s\n' "$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+  site-checks:
+    name: Website / application regressions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      executed: ${{ steps.receipt.outputs.executed }}
+      source_sha: ${{ steps.receipt.outputs.source_sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.19.0
+          package-manager-cache: false
+      - run: node --test tests/security/*.test.mjs
+      - run: node scripts/security/check-public-output.mjs --static
+      - id: receipt
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          printf 'executed=true\nsource_sha=%s\n' "$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+  security-gate:
+    name: Website security gate
+    if: ${{ always() }}
+    needs: [secrets, sast, site-checks]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.19.0
+          package-manager-cache: false
+      - run: node scripts/security/check-website-ci.mjs
+        env:
+          REQUIRED_JOB_RESULTS: ${{ toJSON(needs) }}
+          EXPECTED_SOURCE_SHA: ${{ github.sha }}

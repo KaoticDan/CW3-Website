@@ -1,0 +1,36 @@
+rules:
+  - id: website-no-dynamic-code-execution
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Dynamic code execution requires a separately reviewed design.
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+  - id: website-no-raw-react-html
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Request-controlled content must not flow into raw React HTML.
+    mode: taint
+    pattern-sources:
+      - pattern: $REQ.nextUrl.searchParams.get(...)
+      - pattern: new URL($REQ.url).searchParams.get(...)
+      - pattern: $REQ.json()
+      - pattern: $REQ.text()
+    pattern-sinks:
+      - patterns:
+          - pattern: '<$TAG ... dangerouslySetInnerHTML={{ __html: $VALUE }} ... />'
+          - focus-metavariable: $VALUE
+  - id: website-no-public-privileged-environment-key
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: A public-prefixed environment variable must not contain a privileged key.
+    patterns:
+      - pattern: process.env.$KEY
+      - metavariable-regex:
+          metavariable: $KEY
+          regex: '^(NEXT_PUBLIC_|VITE_|PUBLIC_).*(SERVICE_ROLE|SECRET|PRIVATE_KEY|RESEND_API_KEY)'
+  - id: website-no-disabled-node-tls
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Do not disable Node TLS certificate verification.
+    pattern: process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"

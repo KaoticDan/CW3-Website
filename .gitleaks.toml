@@ -1,0 +1,16 @@
+title = "Reviewed non-secret matches only"
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Apollo cache key function expressions, not credentials"
+condition = "AND"
+regexTarget = "line"
+paths = ['''^public/assets/2c6645210c7ebc36\.js$''']
+regexes = [
+  '''^\s*keyArgs === false \? simpleKeyArgsFn : isArray\(keyArgs\) \? keyArgsFnFromSpecifier\(keyArgs\) : typeof keyArgs === "function" \? keyArgs : existing2\.keyFn;\s*$''',
+  '''^\s*existing2\.keyFn = existing2\.keyFn \|\| simpleKeyArgsFn;\s*$'''
+]

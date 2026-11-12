@@ -18,7 +18,7 @@ The Work page's original form contains name, email, and phone fields. It does **
 2. Set `SUPABASE_URL` and `SUPABASE_SECRET_KEY` in the CW3 Vercel project. The secret key must remain server-side.
 3. Deploy and verify a real submission in `public.cw3_work_submissions`.
 
-The Hire page retains its original Google appointment embed. The source embed currently says “Appointment not found”; its owner must repair the calendar schedule for booking to work.
+The Hire page uses the Google appointment schedule currently embedded on OUAB's Schedule Call page, replacing the original CW3 schedule that said “Appointment not found”. Bookings through this embed go to OUAB's calendar.
 
 ## Deploy configuration
 

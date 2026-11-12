@@ -59,6 +59,17 @@ for route in inventory["pages"]:
         count=1,
     )
 
+    if route == "/hire":
+        # Use the current appointment schedule embedded on ouab.io/schedule-call.
+        content = content.replace(
+            "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0my2-sfH4g67xLIN5eE6b4LeVY6np7uiQOMImwYheiLAYBs4D9flSK8rO4JXPLeDF_7b2wHLtY?gv=true",
+            "https://calendar.google.com/calendar/appointments/schedules/AcZssZ3WTnRFe9mUbHTzx4ClSLoRTV0aTxC2DWJ5PuReMv404HKU4eI4-6077GaSLGGbWtE2NIngtyXm?gv=true",
+        )
+        content = content.replace(
+            'style="border: 0" width="100%" height="625" frameborder="0"',
+            'style="border: 0" width="100%" height="625" title="Schedule a call with Careers in Web3" frameborder="0"',
+        )
+
     target = PUBLIC / (route.strip("/") + ".html") if route != "/" else PUBLIC / "index.html"
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(content, encoding="utf-8")

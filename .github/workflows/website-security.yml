@@ -1,0 +1,25 @@
+name: Website security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  security:
+    name: Website security gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Scan committed files and public embeds
+        run: python3 scripts/website_security_gate.py
+      - name: Check website code syntax
+        run: |
+          node --check api/work-submission.mjs
+          node --check public/cw3-site.js
+          python3 -m py_compile prepare.py optimize.py

@@ -9,7 +9,7 @@
 - The follow-up mobile review and fixes across 320–1024 px are documented in [MOBILE_AUDIT.md](MOBILE_AUDIT.md).
 - The local performance pass and its comparison with the supplied GTmetrix report are documented in [PERFORMANCE_AUDIT.md](PERFORMANCE_AUDIT.md).
 - The only source form is on `/work`; its label suggests resume upload, but no upload control exists in the source.
-- The source `/hire` Google appointment iframe displays “Appointment not found”.
+- The `/hire` Google appointment iframe now uses the same schedule as OUAB's current Schedule Call page; bookings go to OUAB's calendar.
 - Source template copy and placeholder links are retained where no finished content exists. The two obvious footer mislinks for Hire and About are corrected to their existing pages.
 - Supabase migration and Vercel environment values are prepared, but no database changes or deployment have occurred.
 
